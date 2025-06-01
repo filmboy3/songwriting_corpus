@@ -1,0 +1,93 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+songwriting_env/
+songwriting_venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# API Keys and Credentials
+api_config.json
+*_session
+*.session
+credentials.json
+*_credentials*
+
+# Large Data Files
+*.mp3
+*.wav
+*.mp4
+*.jpg
+*.jpeg
+*.png
+*.pdf
+*.zip
+*.tar.gz
+*.json
+*.jsonl
+*.csv
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+podcasts/mp3s/
+podcasts/transcripts/
+instagram/images/
+instagram/data/
+data/lyrics/
+data/chords/
+data/rhymes/
+data/imagery/
+model_output/
+raw_pdfs/
+pdf_extracts/
+
+# Allow specific files that should be included despite patterns above
+!requirements.txt
+!README.md
+!LICENSE
+!TOKENIZATION_PLAN.md
+!.gitignore
