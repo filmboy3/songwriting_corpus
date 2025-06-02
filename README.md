@@ -10,8 +10,10 @@ This project creates a specialized corpus for songwriting by:
 2. Transcribing songwriting podcasts using Whisper
 3. Scraping Instagram content from songwriting experts
 4. Integrating diverse content sources with appropriate control tokens
-5. Training a custom language model (GPT-2 based) on this corpus
-6. Generating creative songwriting content (lyrics, podcast-style content, Instagram tips)
+5. Training custom language models (GPT-2, TinyLlama, and Llama 3) on this corpus
+6. Implementing PEFT/LoRA fine-tuning for efficient training on consumer hardware
+7. Generating creative songwriting content (lyrics, podcast-style content, Instagram tips)
+8. Enhancing generation with RAG (Retrieval-Augmented Generation) capabilities
 
 ## Project Status & Progress
 
@@ -22,12 +24,18 @@ The songwriting corpus project has been successfully implemented:
 - **Corpus Size**: 
   - 2,497+ lyrics files from various sources
   - 100+ Instagram posts from songwriting experts
-  - 82+ podcast transcripts processed
-- **Model Training**: Successfully trained both GPT-2 base and GPT-2 medium models on the corpus
-- **Content Generation**: Implemented generation capabilities for lyrics, podcast content, and Instagram posts
+  - 328+ podcast transcripts processed (82+ fully transcribed)
+- **Model Training**: 
+  - Successfully trained GPT-2 base and GPT-2 medium models on the corpus
+  - Implemented TinyLlama fine-tuning as an intermediate model
+  - Added Llama 3 (8B) fine-tuning with PEFT/LoRA for memory efficiency on Mac MPS hardware
+- **Content Generation**: 
+  - Implemented generation capabilities for lyrics, podcast content, and Instagram posts
+  - Added RAG (Retrieval-Augmented Generation) capabilities for enhanced context
 - **Background Tasks**: Continuing collection of podcast transcriptions and Instagram content
 - **Preprocessing**: Completed cleaning, normalization, and integration pipelines for all data sources
 - **GitHub Integration**: Project code pushed to GitHub repository
+- **Memory Optimization**: Implemented memory-efficient training for large models on consumer hardware
 
 ### Completed Tasks
 
@@ -58,6 +66,15 @@ The songwriting corpus project has been successfully implemented:
 - ✅ Developed complete transcript workflow to process JSON to formatted corpus files
 - ✅ Successfully integrated 82+ transcripts (25% complete) into corpus
 
+#### Advanced Model Training & Optimization
+- ✅ Implemented Llama 3 (8B) fine-tuning with PEFT/LoRA for memory efficiency
+- ✅ Created memory-optimized training pipeline for Mac MPS hardware
+- ✅ Developed robust data loading for multiple songwriting data sources
+- ✅ Implemented gradient checkpointing and accumulation for reduced memory footprint
+- ✅ Added special loading technique for large models on Mac (CPU→MPS transfer)
+- ✅ Fixed gradient computation issues specific to Mac MPS hardware
+- ✅ Created comprehensive instruction-following dataset formatting
+
 #### Instagram Content Integration
 - ✅ Developed Instagram scrapers for songwriting experts (Andrea Stolpe, Mel Robbins)
 - ✅ Implemented OCR text extraction from Instagram images
@@ -67,18 +84,21 @@ The songwriting corpus project has been successfully implemented:
 
 ### In Progress
 
+- 🔄 Llama 3 (8B) fine-tuning with PEFT/LoRA on podcast corpus (3 epochs)
 - 🔄 Extended model training (5 epochs for GPT-2 base, 3 epochs for GPT-2 medium)
 - 🔄 Continuing Whisper transcription of remaining podcast episodes
 - 🔄 Expanding Instagram scraping to include more songwriting experts
 - 🔄 Refining generation parameters for improved output quality
+- 🔄 Optimizing memory usage for large model training on consumer hardware
 
 ### Next Steps
 
 1. **Model Improvement**:
-   - Complete extended training of GPT-2 base (5 epochs) and GPT-2 medium (3 epochs) models
+   - Complete Llama 3 (8B) fine-tuning with PEFT/LoRA on the full podcast corpus
+   - Evaluate fine-tuned Llama 3 model performance on songwriting tasks
    - Experiment with different generation parameters (temperature, top-k, top-p)
    - Implement post-processing to clean up repetitive content
-   - Consider fine-tuning larger models (GPT-2 large) if resources permit
+   - Consider integrating the fine-tuned model into the RAG system
 
 2. **Corpus Expansion**:
    - Complete podcast transcription pipeline for all remaining episodes
