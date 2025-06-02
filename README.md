@@ -42,6 +42,15 @@ The songwriting corpus project has been successfully implemented:
 - ✅ Implemented FAISS embedding index builder (`build_embedding_index.py`)
 - ✅ Added imagery book parser (`parse_imagery_book.py`)
 
+#### Web Interface
+- ✅ Developed Flask-based conversational web interface for the songwriting assistant
+- ✅ Implemented intent detection for different songwriting tasks (lyrics, chords, structure, etc.)
+- ✅ Created conversation history management with unique session IDs
+- ✅ Added model switching between GPT-2 Base and Medium
+- ✅ Implemented demo mode for testing when models are still training
+- ✅ Built responsive UI with Bootstrap, including theme toggling
+- ✅ Added export functionality to save conversations as markdown files
+
 #### Podcast Transcription Pipeline
 - ✅ Set up Whisper transcription with 'tiny' model for 328 podcast MP3 files
 - ✅ Created transcript cleaning script to remove repetitions and normalize text
@@ -81,8 +90,8 @@ The songwriting corpus project has been successfully implemented:
    - Create a user-friendly interface for generation
    - Implement tools to evaluate and refine generated content
 
-4. **Deployment**:
-   - Create a simple web interface for the model
+4. **Deployment and Enhancement**:
+   - Enhance the existing web interface with additional features
    - Develop a command-line tool for quick generation
    - Consider integrating with songwriting software
 
@@ -131,6 +140,8 @@ python train_songwriting_model.py --model_name gpt2-medium --num_epochs 3 --batc
 
 ### 4. Generate Content
 
+#### Command Line Interface
+
 Generate songwriting content using your trained model:
 
 ```bash
@@ -147,6 +158,26 @@ Adjust generation parameters:
 ```bash
 python generate_songwriting.py --prompt_type lyrics --custom_prompt "Write a song about dreams" --temperature 0.7 --max_length 300 --top_p 0.92
 ```
+
+#### Web Interface
+
+For a more interactive experience, use the conversational web interface:
+
+```bash
+cd /path/to/songwriting_corpus
+source web_venv/bin/activate  # Activate the virtual environment
+python web_interface/app.py
+```
+
+This will start a Flask web server at http://localhost:8889 where you can:
+
+- Have multi-turn conversations with the songwriting assistant
+- Request lyrics, chords, structure, revisions, and style changes
+- Maintain context across multiple requests
+- Export your conversations as markdown files
+- Switch between GPT-2 Base and Medium models
+
+The web interface includes a demo mode that works even when models are still training, allowing you to test the interface functionality before your models are ready.
 
 ## Directory Structure
 

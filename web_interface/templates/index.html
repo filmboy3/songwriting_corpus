@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Songwriting Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .chat-header {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-body {
+            height: calc(100vh - 250px);
+            overflow-y: auto;
+            padding: 20px;
+            background-color: white;
+            border-left: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+        }
+        .chat-footer {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 0 0 10px 10px;
+            border: 1px solid #dee2e6;
+        }
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+        .user-message {
+            margin-left: auto;
+            background-color: #007bff;
+            color: white;
+            border-radius: 20px 20px 0 20px;
+            padding: 10px 15px;
+        }
+        .assistant-message {
+            margin-right: auto;
+            background-color: #e9ecef;
+            color: #212529;
+            border-radius: 20px 20px 20px 0;
+            padding: 10px 15px;
+            white-space: pre-wrap;
+        }
+        .message-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .input-group {
+            margin-top: 15px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        .model-selector {
+            margin-right: 15px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #007bff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .song-section {
+            font-weight: bold;
+            color: #6610f2;
+            margin-top: 10px;
+        }
+        .chord {
+            font-family: monospace;
+            background-color: #e2e3e5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin: 0 2px;
+        }
+        .tools-panel {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .tool-button {
+            margin: 5px;
+        }
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            height: calc(100vh - 40px);
+        }
+        .conversation-list {
+            margin-top: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+        .conversation-item {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .conversation-item:hover {
+            background-color: #495057;
+        }
+        .active-conversation {
+            background-color: #007bff;
+        }
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-content pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .markdown-content code {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .markdown-content ul, .markdown-content ol {
+            margin-left: 20px;
+        }
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+        .theme-toggle {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-3">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <h3>Songwriting Assistant</h3>
+                    <p>Your AI-powered songwriting companion</p>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button id="newConversationBtn" class="btn btn-outline-light">
+                            <i class="fas fa-plus-circle me-2"></i>New Song
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Model</h5>
+                        <select id="modelSelector" class="form-select">
+                            <option value="base">GPT-2 Base</option>
+                            <option value="medium">GPT-2 Medium</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Quick Prompts</h5>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-sm btn-outline-light quick-prompt" data-prompt="Write a song about love and loss">Love & Loss Song</button>
+                            <button class="btn btn-sm btn-outline-light quick-prompt" data-prompt="Suggest chord progressions for a melancholy verse">Melancholy Chords</button>
+                            <button class="btn btn-sm btn-outline-light quick-prompt" data-prompt="Add a bridge to this song">Add Bridge</button>
+                            <button class="btn btn-sm btn-outline-light quick-prompt" data-prompt="Rewrite the chorus to be more uplifting">Uplifting Chorus</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Recent Songs</h5>
+                        <div id="conversationList" class="conversation-list">
+                            <!-- Conversation history will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h4 id="currentSongTitle">New Song</h4>
+                        <div>
+                            <button id="exportBtn" class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                            <span class="ms-3 theme-toggle">
+                                <i class="fas fa-moon"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="tools-panel">
+                        <div class="d-flex flex-wrap">
+                            <button class="btn btn-sm btn-outline-secondary tool-button" data-tool="lyrics">
+                                <i class="fas fa-music me-1"></i>Lyrics
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary tool-button" data-tool="chords">
+                                <i class="fas fa-guitar me-1"></i>Chords
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary tool-button" data-tool="structure">
+                                <i class="fas fa-layer-group me-1"></i>Structure
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary tool-button" data-tool="revise">
+                                <i class="fas fa-edit me-1"></i>Revise
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary tool-button" data-tool="style">
+                                <i class="fas fa-paint-brush me-1"></i>Style
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary tool-button" data-tool="analyze">
+                                <i class="fas fa-search me-1"></i>Analyze
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="chatBody" class="chat-body">
+                        <!-- Messages will be displayed here -->
+                        <div class="assistant-message message">
+                            <div class="markdown-content">
+                                Hello! I'm your AI songwriting assistant. I can help you create lyrics, suggest chord progressions, build song structures, and more. What would you like to work on today?
+                            </div>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-footer">
+                        <div class="input-group">
+                            <input type="text" id="userInput" class="form-control" placeholder="Type your songwriting request..." aria-label="Message">
+                            <button class="btn btn-primary" type="button" id="sendButton">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatBody = document.getElementById('chatBody');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const newConversationBtn = document.getElementById('newConversationBtn');
+            const modelSelector = document.getElementById('modelSelector');
+            const quickPromptButtons = document.querySelectorAll('.quick-prompt');
+            const toolButtons = document.querySelectorAll('.tool-button');
+            const exportBtn = document.getElementById('exportBtn');
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            let conversationId = null;
+            let isWaitingForResponse = false;
+            
+            // Initialize
+            checkAvailableModels();
+            
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            newConversationBtn.addEventListener('click', startNewConversation);
+            
+            quickPromptButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    userInput.value = this.getAttribute('data-prompt');
+                    sendMessage();
+                });
+            });
+            
+            toolButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tool = this.getAttribute('data-tool');
+                    let promptPrefix = '';
+                    
+                    switch(tool) {
+                        case 'lyrics':
+                            promptPrefix = 'Write lyrics about ';
+                            break;
+                        case 'chords':
+                            promptPrefix = 'Suggest chord progressions for ';
+                            break;
+                        case 'structure':
+                            promptPrefix = 'Create a song structure for ';
+                            break;
+                        case 'revise':
+                            promptPrefix = 'Revise the lyrics to ';
+                            break;
+                        case 'style':
+                            promptPrefix = 'Write a song in the style of ';
+                            break;
+                        case 'analyze':
+                            promptPrefix = 'Analyze these lyrics: ';
+                            break;
+                    }
+                    
+                    userInput.value = promptPrefix;
+                    userInput.focus();
+                });
+            });
+            
+            exportBtn.addEventListener('click', exportConversation);
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Functions
+            function sendMessage() {
+                if (isWaitingForResponse || userInput.value.trim() === '') return;
+                
+                const message = userInput.value.trim();
+                addMessageToChat('user', message);
+                userInput.value = '';
+                
+                isWaitingForResponse = true;
+                
+                // Add loading indicator
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'assistant-message message';
+                loadingDiv.innerHTML = '<div class="loading"></div>';
+                loadingDiv.id = 'loadingMessage';
+                chatBody.appendChild(loadingDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+                
+                // Send to backend
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: message,
+                        model: modelSelector.value
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove loading indicator
+                    const loadingMessage = document.getElementById('loadingMessage');
+                    if (loadingMessage) {
+                        loadingMessage.remove();
+                    }
+                    
+                    addMessageToChat('assistant', data.response);
+                    conversationId = data.conversation_id;
+                    
+                    // Update song title if this is a new song
+                    updateSongTitle(message);
+                    
+                    isWaitingForResponse = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                    // Remove loading indicator
+                    const loadingMessage = document.getElementById('loadingMessage');
+                    if (loadingMessage) {
+                        loadingMessage.remove();
+                    }
+                    
+                    addMessageToChat('assistant', 'Sorry, there was an error processing your request.');
+                    isWaitingForResponse = false;
+                });
+            }
+            
+            function addMessageToChat(sender, content) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = sender === 'user' ? 'user-message message' : 'assistant-message message';
+                
+                if (sender === 'assistant') {
+                    // Process content for special formatting
+                    content = formatContent(content);
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'markdown-content';
+                    contentDiv.innerHTML = marked.parse(content);
+                    messageDiv.appendChild(contentDiv);
+                } else {
+                    messageDiv.textContent = content;
+                }
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = 'Just now';
+                messageDiv.appendChild(timeDiv);
+                
+                chatBody.appendChild(messageDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+            
+            function formatContent(content) {
+                // Format song sections
+                content = content.replace(/<\|verse\|>/g, '### Verse');
+                content = content.replace(/<\|chorus\|>/g, '### Chorus');
+                content = content.replace(/<\|bridge\|>/g, '### Bridge');
+                content = content.replace(/<\|intro\|>/g, '### Intro');
+                content = content.replace(/<\|outro\|>/g, '### Outro');
+                content = content.replace(/<\|song\|>/g, '');
+                content = content.replace(/<\|endoftext\|>/g, '');
+                
+                // Format chord names
+                const chordRegex = /\b([A-G][#b]?(?:maj|min|m|aug|dim|sus[24]|[2-9]|add\d|maj\d|m\d)?(?:\/[A-G][#b]?)?)\b/g;
+                content = content.replace(chordRegex, '`$1`');
+                
+                return content;
+            }
+            
+            function startNewConversation() {
+                fetch('/api/new_conversation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    conversationId = data.conversation_id;
+                    
+                    // Clear chat
+                    chatBody.innerHTML = '';
+                    
+                    // Add welcome message
+                    addMessageToChat('assistant', 'Hello! I\'m your AI songwriting assistant. What would you like to work on today?');
+                    
+                    // Update song title
+                    document.getElementById('currentSongTitle').textContent = 'New Song';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            
+            function checkAvailableModels() {
+                fetch('/api/models')
+                .then(response => response.json())
+                .then(data => {
+                    const modelSelector = document.getElementById('modelSelector');
+                    modelSelector.innerHTML = '';
+                    
+                    data.models.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = model.name;
+                        modelSelector.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            
+            function updateSongTitle(message) {
+                // Only update if it's currently "New Song"
+                if (document.getElementById('currentSongTitle').textContent === 'New Song') {
+                    let title = 'New Song';
+                    
+                    // Try to extract a title from the message
+                    if (message.toLowerCase().includes('write a song about')) {
+                        title = message.split('write a song about')[1].trim();
+                        title = title.charAt(0).toUpperCase() + title.slice(1);
+                        
+                        // Truncate if too long
+                        if (title.length > 30) {
+                            title = title.substring(0, 30) + '...';
+                        }
+                    }
+                    
+                    document.getElementById('currentSongTitle').textContent = title;
+                }
+            }
+            
+            function exportConversation() {
+                // Get all messages
+                const messages = [];
+                const userMessages = document.querySelectorAll('.user-message');
+                const assistantMessages = document.querySelectorAll('.assistant-message');
+                
+                // Combine in order (this is a simplification)
+                for (let i = 0; i < userMessages.length; i++) {
+                    messages.push({
+                        role: 'user',
+                        content: userMessages[i].textContent.replace('Just now', '').trim()
+                    });
+                    
+                    if (i < assistantMessages.length) {
+                        messages.push({
+                            role: 'assistant',
+                            content: assistantMessages[i].querySelector('.markdown-content') 
+                                ? assistantMessages[i].querySelector('.markdown-content').innerText.trim()
+                                : assistantMessages[i].textContent.replace('Just now', '').trim()
+                        });
+                    }
+                }
+                
+                // Create a formatted text version
+                let exportText = `# ${document.getElementById('currentSongTitle').textContent}\n\n`;
+                
+                messages.forEach(msg => {
+                    exportText += `## ${msg.role === 'user' ? 'You' : 'AI Assistant'}\n${msg.content}\n\n`;
+                });
+                
+                // Create and trigger download
+                const blob = new Blob([exportText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${document.getElementById('currentSongTitle').textContent.replace(/\s+/g, '_')}.md`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                const icon = themeToggle.querySelector('i');
+                if (icon.classList.contains('fa-moon')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
