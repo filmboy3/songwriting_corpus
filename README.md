@@ -1,32 +1,33 @@
 # Songwriting Corpus Project
 
-A comprehensive system for building an AI-powered songwriting assistant that learns from your favorite artists, integrates chord progression analysis, and leverages rhyming dictionaries and imagery resources.
+A comprehensive system for building an AI-powered songwriting assistant that learns from your favorite artists, songwriting podcasts, and expert Instagram content to generate creative songwriting material.
 
 ## Overview
 
 This project creates a specialized corpus for songwriting by:
 
-1. Downloading songs from your favorite artists (prioritizing 93 artists in MinimalArtistList.txt)
-2. Analyzing chord progressions and integrating them with lyrics
-3. Building a comprehensive rhyming dictionary using the Datamuse API
-4. Processing additional resources like imagery books
-5. Training a custom language model on this corpus
-6. Deploying the model as a personal songwriting assistant
+1. Collecting lyrics from favorite artists (prioritizing artists in MinimalArtistList.txt)
+2. Transcribing songwriting podcasts using Whisper
+3. Scraping Instagram content from songwriting experts
+4. Integrating diverse content sources with appropriate control tokens
+5. Training a custom language model (GPT-2 based) on this corpus
+6. Generating creative songwriting content (lyrics, podcast-style content, Instagram tips)
 
 ## Project Status & Progress
 
-### Current Status (Updated: June 1, 2025)
+### Current Status (Updated: June 2, 2025)
 
-The songwriting corpus project has made significant progress:
+The songwriting corpus project has been successfully implemented:
 
 - **Corpus Size**: 
-  - 2,497 lyrics files converted from various sources
+  - 2,497+ lyrics files from various sources
   - 100+ Instagram posts from songwriting experts
-  - 82+ podcast transcripts (25% of 328 total) processed
-- **Master Script**: Created `build_complete_corpus.py` to orchestrate the entire corpus building process
-- **Tooling**: Implemented scripts for extracting lyrics, importing CSV data, analyzing artist distribution, and spot checking files
-- **Background Tasks**: Set up continuous collection of songs, podcast transcriptions, and Instagram content in the background
-- **Preprocessing**: Implemented cleaning, normalization, and integration pipelines for all data sources
+  - 82+ podcast transcripts processed
+- **Model Training**: Successfully trained both GPT-2 base and GPT-2 medium models on the corpus
+- **Content Generation**: Implemented generation capabilities for lyrics, podcast content, and Instagram posts
+- **Background Tasks**: Continuing collection of podcast transcriptions and Instagram content
+- **Preprocessing**: Completed cleaning, normalization, and integration pipelines for all data sources
+- **GitHub Integration**: Project code pushed to GitHub repository
 
 ### Completed Tasks
 
@@ -57,105 +58,95 @@ The songwriting corpus project has made significant progress:
 
 ### In Progress
 
-- 🔄 Building rhyming dictionary using Datamuse API
-- 🔄 Parsing imagery happiness book
-- 🔄 Fetching chord progressions from Ultimate Guitar and HookTheory
-- 🔄 Preparing FAISS embedding index for lyrics and chords
-- 🔄 Completing Whisper transcription of remaining podcast episodes (75% remaining)
-- 🔄 Expanding Instagram scraping to include all available posts from Andrea Stolpe
-- 🔄 Developing tokenization pipeline for combined corpus sources
+- 🔄 Extended model training (5 epochs for GPT-2 base, 3 epochs for GPT-2 medium)
+- 🔄 Continuing Whisper transcription of remaining podcast episodes
+- 🔄 Expanding Instagram scraping to include more songwriting experts
+- 🔄 Refining generation parameters for improved output quality
 
 ### Next Steps
 
-1. **Environment Setup**:
-   - Ensure you have an active Genius API token in `api_config.json`
-   - Configure HookTheory credentials if chord analysis is enabled
-   - Install required packages: `pip install -r requirements.txt`
-   - Download CMU Pronouncing Dictionary: `python download_cmudict.py`
+1. **Model Improvement**:
+   - Complete extended training of GPT-2 base (5 epochs) and GPT-2 medium (3 epochs) models
+   - Experiment with different generation parameters (temperature, top-k, top-p)
+   - Implement post-processing to clean up repetitive content
+   - Consider fine-tuning larger models (GPT-2 large) if resources permit
 
 2. **Corpus Expansion**:
-   - Continue adding songs from underrepresented sources (Bollywood, K-pop, Afrobeat, hip-hop, jazz)
-   - Build embedding index: `python build_embedding_index.py`
-   - Parse imagery resources: `python parse_imagery_book.py --sample`
-   - Complete podcast transcription pipeline for all 328 episodes
+   - Complete podcast transcription pipeline for all remaining episodes
    - Add more Instagram songwriting experts to the corpus
+   - Consider adding other songwriting resources like interviews or articles
 
-3. **Tokenization & Model Preparation**:
-   - Develop unified tokenization pipeline for all corpus sources
-   - Define special tokens for songwriting elements (chords, sections, techniques)
-   - Implement rhyme intelligence module with phonetic awareness
-   - Prepare training data with appropriate formatting and metadata
+3. **Generation Enhancement**:
+   - Develop more sophisticated prompting techniques
+   - Create a user-friendly interface for generation
+   - Implement tools to evaluate and refine generated content
 
-4. **Model Training**:
-   - Select appropriate base model architecture
-   - Configure training parameters and optimization strategy
-   - Implement evaluation metrics specific to songwriting
-   - Set up model checkpointing and version control
+4. **Deployment**:
+   - Create a simple web interface for the model
+   - Develop a command-line tool for quick generation
+   - Consider integrating with songwriting software
 
 ## Quick Start
 
-### 1. Set Up Your API Token
+### 1. Install Dependencies
 
-Edit `api_config.json` to include your Genius API token:
-
-```json
-{
-  "genius_token": "YOUR_GENIUS_API_TOKEN"
-}
-```
-
-### 2. Start Building Your Corpus
-
-You have two options for building your corpus:
-
-#### Option A: Basic Setup
+Install the required packages:
 
 ```bash
-python start_corpus_build.py
+pip install -r requirements.txt
 ```
 
-This will:
-- Set up your API tokens
-- Download songs from your prioritized artists
-- Build a rhyming dictionary
-- Start continuous collection in the background
+Make sure you have the following key dependencies:
+- transformers
+- torch
+- datasets
+- accelerate (>= 0.26.0)
 
-#### Option B: Complete Corpus Build (Recommended)
+### 2. Prepare Your Corpus
+
+If you haven't already prepared your corpus:
 
 ```bash
-python build_complete_corpus.py
+python prepare_training_corpus.py
 ```
 
-This comprehensive script will:
-- Extract lyrics from chord files
-- Import chord and lyrics data from CSV
-- Analyze artist distribution
-- Run batch chord progression analysis
-- Spot check random files for quality
-- Generate corpus statistics and reports
-
-You can customize the build with these options:
-```bash
-python build_complete_corpus.py --prioritized-only --skip-csv-import --skip-chord-analysis
-```
-
-The initial corpus will be ready for training within 5 hours, while continuing to collect additional songs in the background.
+This will process and combine data from:
+- Lyrics files in the lyrics directory
+- Podcast transcripts in the podcasts directory
+- Instagram content in the instagram directory
 
 ### 3. Train Your Model
 
-Once you have enough data (after the initial 5-hour collection):
+Train the model on your prepared corpus:
 
 ```bash
-python train_model.py --base_model gpt2-medium --epochs 3 --batch_size 4 --fp16
+python train_songwriting_model.py --model_name gpt2 --num_epochs 5 --batch_size 4
 ```
 
-### 4. Deploy Your Songwriting Assistant
+For better results, use the medium-sized model:
 
 ```bash
-python deploy_model.py --host localhost --port 5000
+python train_songwriting_model.py --model_name gpt2-medium --num_epochs 3 --batch_size 2 --output_dir model_output_medium
 ```
 
-Then open the web interface in your browser at `http://localhost:5000` or use the included web interface files.
+### 4. Generate Content
+
+Generate songwriting content using your trained model:
+
+```bash
+python generate_songwriting.py --prompt_type lyrics --custom_prompt "Write a song about love"
+```
+
+You can specify different prompt types:
+- `lyrics`: Generate song lyrics
+- `podcast`: Generate podcast-style content about songwriting
+- `instagram`: Generate Instagram-style songwriting tips
+- `custom`: Use a completely custom prompt
+
+Adjust generation parameters:
+```bash
+python generate_songwriting.py --prompt_type lyrics --custom_prompt "Write a song about dreams" --temperature 0.7 --max_length 300 --top_p 0.92
+```
 
 ## Directory Structure
 
@@ -343,45 +334,53 @@ This will check for new songs from your favorite artists every hour and add them
 
 ## Model Training
 
-The training process uses the Transformers library to fine-tune a GPT-2 model on your songwriting corpus. The model learns patterns from lyrics, chord progressions, rhyming dictionaries, and imagery resources.
+The training process uses the Hugging Face Transformers library to fine-tune a GPT-2 model on your songwriting corpus. The model learns patterns from lyrics, podcast transcripts, and Instagram content.
 
 Key parameters for training:
-- `--base_model`: Base model to fine-tune (gpt2, gpt2-medium, gpt2-large)
-- `--epochs`: Number of training epochs
-- `--batch_size`: Training batch size
-- `--fp16`: Use mixed precision training (faster on compatible GPUs)
-- `--resume_from`: Path to resume training from a checkpoint
+- `--model_name`: Base model to fine-tune (gpt2, gpt2-medium, gpt2-large)
+- `--num_epochs`: Number of training epochs (recommended: 3-5)
+- `--batch_size`: Training batch size (adjust based on available memory)
+- `--output_dir`: Directory to save the trained model
+- `--save_steps`: Number of steps between saving checkpoints
 
-## Deployment Options
+The training script handles:
+- Loading and preprocessing the corpus
+- Setting up the tokenizer with special tokens
+- Configuring training parameters
+- Training the model with progress tracking
+- Saving the model and tokenizer
 
-### 1. Local Deployment
+## Content Generation
 
-The simplest option is to run the model locally on your machine:
+The `generate_songwriting.py` script provides a flexible interface for generating different types of songwriting content.
+
+### Generation Options
+
+1. **Prompt Types**:
+   - `lyrics`: Generate song lyrics with verse/chorus structure
+   - `podcast`: Generate podcast-style content about songwriting techniques
+   - `instagram`: Generate Instagram-style songwriting tips with hashtags
+   - `custom`: Use a completely custom prompt format
+
+2. **Key Parameters**:
+   - `--custom_prompt`: Specific topic or starting text for generation
+   - `--temperature`: Controls randomness (0.5-0.9 recommended)
+   - `--max_length`: Maximum length of generated text
+   - `--top_p`: Nucleus sampling parameter (0.85-0.95 recommended)
+   - `--model_dir`: Directory containing the trained model (default: model_output)
+
+3. **Example Commands**:
 
 ```bash
-python deploy_model.py --host localhost --port 5000
+# Generate lyrics about dreams
+python generate_songwriting.py --prompt_type lyrics --custom_prompt "Write a song about dreams"
+
+# Generate podcast content about writing choruses
+python generate_songwriting.py --prompt_type podcast --custom_prompt "Writing effective choruses"
+
+# Generate Instagram tips about finding inspiration
+python generate_songwriting.py --prompt_type instagram --custom_prompt "finding inspiration"
 ```
-
-### 2. Cloud Deployment
-
-For accessing your model from anywhere, you can deploy it to a cloud service like:
-- Google Cloud Platform
-- Amazon Web Services (EC2)
-- DigitalOcean
-- Hugging Face Spaces
-- Replicate.com
-
-### 3. Web Interface
-
-A simple web interface is included in the `web_interface` directory. You can serve it using any web server:
-
-```bash
-# Using Python's built-in HTTP server
-cd web_interface
-python -m http.server 8080
-```
-
-Then open your browser to `http://localhost:8080`.
 
 ## Copyright Considerations
 
